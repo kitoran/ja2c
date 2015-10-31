@@ -1,9 +1,21 @@
 {-# Language NoMonomorphismRestriction #-}
 module Interaction where
 
+import Control.Monad
+
 import Data.List
+import Data.Char (toUpper)
 
 import Field
+import GameLogicPure
+
+prompt = ">"
+loop::Field Int -> IO ()
+loop field = do prprint field
+                putStr (prompt ++ " ")
+                s <- getLine                      --may be it's better to use getContents 
+                when (s /= "q") 
+                     (let d = read $ map toUpper s ::Direction in loop $ merge 4 d field)
 
 
 prprint a = putStr $ prprintiter 0 $ reverse $ transpose a
