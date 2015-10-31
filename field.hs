@@ -1,16 +1,16 @@
 {-# Language NoMonomorphismRestriction #-}
 module Field where
 import Data.List
-data SimpleCoords a = SC a a a
+data SimpleCoords a = SC a a a deriving(Show, Eq, Ord, Read)
 {-
 These simple coordinates work like this:
-They are more closely related to cartesian coordinates then to barycentric despite number of components
                (1,2,0) (2,2,0)
            (0,1,0) (1,1,0) (2,1,0)
        (0,1,1) (0,0,0) (1,0,0) (2,0,0)
            (0,0,1) (1,0,1) (2,0,1)
                (1,0,2) (2,0,2)
                    (2,0,3)
+They are more closely related to cartesian coordinates then to barycentric or homogeneous despite number of components
 
 for arbitrary d (a,b,c) and (a+d, b+d, c+d) correspond to the same point 
 coordinates are defined uniquely under condition that its components are non-negative and at least one of them is zero
@@ -50,8 +50,18 @@ rotateClockwise ::(Integral a) => a -> Field Int -> Field Int
 rotateClockwise a f = [[maybe (-1) id   $ f !# SC (a-1-j+i) i 0 | j <- [0 .. a*2-2]]| i <- [0 .. a*2-2]]
 rotateCounterclockwise ::(Integral a) => a -> Field Int -> Field Int 
 rotateCounterclockwise a f = [[maybe (-1) id   $ f !# SC j (a+j-1-i) 0 | j <- [0 .. a*2-2]]| i <- [0 .. a*2-2]]
---i dont know how to make it less magical
+--i don't know how to make it less magical
 
 data Direction = K | I | U | H | N | M deriving(Show, Eq, Enum, Ord, Read) -- keys around J key in qwerty keyboard
+{- Direction may be moved to logic -}
+infix 4 =#
+(=#)::(Integral b) => Field a -> SimpleCoords b -> a -> Field a -- Partial function attention!!
+((_:xs):xss) =# (SC 0 0 0) = \x -> (x:xs):xss
+((x:xs):xss) =# (SC 0 y 0) = \a -> let (ys:_) = (xs:xss =# SC 0 (y-1) 0) a in (x:ys):xss
+(ns:nss)     =# (SC x y 0) = \a -> ns : ((nss =# SC (x-1) y 0) a)
+nss          =# (SC x y z) = nss =# SC (x-z) (y-z) 0
 
+
+blank n = [replicate (n + i) 0 ++ replicate (n - i - 1) (-1)| i <- [0..n-1]] 
+       ++ [replicate i (-1) ++ replicate (n*2 - i - 1) 0| i <- [1..n-1]]
 
