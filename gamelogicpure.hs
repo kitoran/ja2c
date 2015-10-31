@@ -27,4 +27,8 @@ merge a N = rotateClockwise a . map merge1 . rotateCounterclockwise a
 merge _ M = map merge1
 
 
- 
+findblanks f = myconcat 0 (map (elemIndices 0) f)
+    where 
+          myconcat n ((x:xs):xss) = SC n x 0 : myconcat n (xs:xss)
+          myconcat n ([]:xss) = myconcat (n+1) xss
+          myconcat n [] = []
