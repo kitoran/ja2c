@@ -6,6 +6,8 @@ import Control.Monad
 import Data.List
 import Data.Char (toUpper)
 
+import System.Random
+
 import Field
 import GameLogicPure
 
@@ -14,8 +16,14 @@ loop::Field Int -> IO ()
 loop field = do prprint field
                 putStr (prompt ++ " ")
                 s <- getLine                      --may be it's better to use getContents 
-                when (s /= "q") 
-                     (let d = read $ map toUpper s ::Direction in loop $ merge 4 d field)
+                when (s /= "q")
+                     (do let d = read $ map toUpper s -- ::Direction
+                         let tf = merge 4 d field     ---- !!! 4
+                         let zeros = findblanks tf
+                         ix <- randomRIO (0, length zeros-1)
+                         let sc = zeros !! ix
+                         isItFour <- randomIO -- ::Bool
+                         loop $ (tf =# sc) (if isItFour then 4 else 2))
 
 
 prprint a = putStr $ prprintiter 0 $ reverse $ transpose a
