@@ -8,7 +8,7 @@ import Field
 merge1 a = prefix ++ (mergeM list) ++ postfix 
     where (prefix, tlist) = span (== (-1)) a
           (list, postfix) = break (== (-1)) tlist
---          mergeM::[Int] -> [Int] -- unfortunately, has nothing to do with monads
+--          mergeM::[Int] -> [Int] -- unfortunately, this has nothing to do with monads
           mergeM []          = []
           mergeM [a]         = [a]
           mergeM (0:xs)      = mergeM xs ++ [0]
